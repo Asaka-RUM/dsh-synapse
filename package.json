@@ -1,6 +1,6 @@
 {
   "name": "dsh-synapse",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "A visual, non-linear conversation workspace plugin for DeepSeek Harness.",
   "type": "module",
   "main": "index.js",
