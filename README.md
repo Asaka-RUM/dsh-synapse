@@ -1,13 +1,15 @@
 # dsh-synapse
 
-![version](https://img.shields.io/badge/version-0.3.1-3478f6?style=flat-square)
+![version](https://img.shields.io/badge/version-0.3.2-3478f6?style=flat-square)
 ![license](https://img.shields.io/badge/license-MIT-10b981?style=flat-square)
 ![platform](https://img.shields.io/badge/platform-web-7c3aed?style=flat-square)
 ![node](https://img.shields.io/badge/node-%3E%3D22.19-334155?style=flat-square)
 
 **A visual, non-linear conversation workspace plugin for DeepSeek Harness.**
 
-> **Fork note**: this is a maintenance fork of [liangmianya/dsh-synapse](https://github.com/liangmianya/dsh-synapse) (MIT, upstream v0.3.0). One fix over upstream: `client.js` now declares the loader-provided `require` parameter (`factory: (require) => ...`) so the client module boots on dsh 0.1.0-rc.6's module loader (`ReferenceError: require is not defined` otherwise). No other changes.
+> **Fork note**: this is a maintenance fork of [liangmianya/dsh-synapse](https://github.com/liangmianya/dsh-synapse) (MIT, upstream v0.3.0). Changes over upstream:
+> - `client.js` declares the loader-provided `require` parameter (`factory: (require) => ...`) so the client module boots on dsh 0.1.0-rc.6's module loader (`ReferenceError: require is not defined` otherwise).
+> - The floating bubble view switcher (`.dsh-synapse-switch`) and its legacy overlay entry are removed. The 会话地图 canvas is merged into the dsh-better-sidebar tab bar (`registerTab` id `synapse`), i.e. the plugin now lives inside the sidebar plugin only.
 
 把同一工作区里的会话、追问与分支变成一张可浏览、可拖拽、可放大的对话地图，同时保留 DSH 原生的对话能力。
 
