@@ -17,13 +17,22 @@ const savedCardPositions = (() => {
     return Array.isArray(value) ? value.filter(item => Array.isArray(item) && typeof item[0] === 'string' && item[1] !== null && Number.isFinite(item[1].x) && Number.isFinite(item[1].y)) : []
   } catch { return [] }
 })()
+const SIDEBAR_COLLAPSED_KEY = 'dsh-synapse:sidebar-collapsed'
+// The collapse state lives in session storage: remembered while the app is
+// open (surviving iframe rebuilds on tab switches) but reset on next launch.
+const savedSidebarCollapsed = (() => {
+  try {
+    const value = sessionStorage.getItem(SIDEBAR_COLLAPSED_KEY)
+    return value === null ? true : value === '1'
+  } catch { return true }
+})()
 const CARD_WIDTH = 310
 const CARD_HEIGHT = 276
 const CARD_GAP_Y = 42
 const CAMERA_INSET_X = 56
 const CAMERA_INSET_Y = 56
 const state = {
-  summaries: [], workspace: null, activeId: null, mode: 'canvas', zoom: 1, currentDsh: null, sidebarCollapsed: false,
+  summaries: [], workspace: null, activeId: null, mode: 'canvas', zoom: 1, currentDsh: null, sidebarCollapsed: savedSidebarCollapsed,
   dshWorkspaces: [], selectedDshWorkspaceId: null,
   historyBySession: new Map(), historyRequests: new Map(), pendingReplies: new Map(), pendingRpc: new Map(), liveReplies: new Map(),
   draft: null, error: '', workspaceLoad: 0, branchAnchors: new Map(savedBranchAnchors), cardPositions: new Map(savedCardPositions),
@@ -946,7 +955,11 @@ app.addEventListener('click', async event => {
   const thread = state.workspace?.threads.find(item => item.id === button.dataset.thread)
   try {
     if (button.dataset.action === 'close') post('synapse:close')
-    if (button.dataset.action === 'toggle-sidebar') { state.sidebarCollapsed = !state.sidebarCollapsed; render() }
+    if (button.dataset.action === 'toggle-sidebar') {
+      state.sidebarCollapsed = !state.sidebarCollapsed
+      try { sessionStorage.setItem(SIDEBAR_COLLAPSED_KEY, state.sidebarCollapsed ? '1' : '0') } catch { /* Private browsing may disable session storage. */ }
+      render()
+    }
     if (button.dataset.action === 'create-session') openNewSession()
     if (button.dataset.action === 'open-current' && state.currentDsh !== null) post('synapse:open-session', { sessionId: state.currentDsh.id })
     if (button.dataset.action === 'select-thread' && thread !== undefined) {
