@@ -154,6 +154,14 @@ window.__ModuleLoader__.load({
         React.useEffect(() => {
           const frame = frameRef.current
           const onFrameLoad = () => {
+            try {
+              const iframeDoc = frame?.contentDocument
+              if (iframeDoc) {
+                const s = iframeDoc.createElement('style')
+                s.textContent = '.view-toggle{display:none!important}'
+                iframeDoc.head.appendChild(s)
+              }
+            } catch { /* cross-origin or unavailable */ }
             syncCurrentSession()
             send('synapse:map-opened')
           }
