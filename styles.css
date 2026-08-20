@@ -26,6 +26,7 @@ button.primary:hover { border-color: #000; background: #000; color: #fff; }
 .view-switch button:hover { background: #e5e7eb; color: #111827; }
 .view-switch button.active { background: #111827; color: #fff; }
 .view-switch button:focus-visible { outline: 2px solid #111827; outline-offset: 2px; }
+.view-switch { display: none !important; }
 .canvas-controls { position: fixed; z-index: 80; top: 14px; right: 16px; display: flex; align-items: center; gap: 5px; }
 .canvas-controls button { min-width: 32px; padding: 0 8px; font-size: 12px; }
 .canvas-controls span { min-width: 42px; color: #64748b; font-size: 12px; text-align: center; }
