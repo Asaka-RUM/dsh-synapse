@@ -38,6 +38,7 @@ window.__ModuleLoader__.load({
         const liveUnsubscribers = React.useRef(new Map())
         const knownSessionIds = React.useRef(new Set())
         const syncQueued = React.useRef(false)
+        const sessionSwitchPending = React.useRef(false)
         const send = React.useCallback((type, payload = {}) => {
           const frame = frameRef.current
           if (frame?.contentWindow) frame.contentWindow.postMessage({ source: 'dsh-synapse', type, ...payload }, location.origin)
@@ -108,13 +109,14 @@ window.__ModuleLoader__.load({
           }
           if (type === 'synapse:open-session') {
             try {
-              closeToChat()
+              sessionSwitchPending.current = true
               ctx.sessions.open(event.data.sessionId)
             } catch { send('synapse:bridge-error', { message: '关联的 DSH 会话已不可用' }) }
             return
           }
           if (type === 'synapse:activate-session') {
             try {
+              sessionSwitchPending.current = true
               ctx.sessions.open(event.data.sessionId)
             } catch { send('synapse:bridge-error', { message: '关联的 DSH 会话已不可用' }) }
             return
@@ -171,7 +173,22 @@ window.__ModuleLoader__.load({
           const unsubscribeWorkspaces = ctx.workspaces.list.subscribe(syncCurrentSession)
           syncCurrentSession()
           send('synapse:map-opened')
+          const restoreSynapseTab = () => {
+            if (!sessionSwitchPending.current) return
+            sessionSwitchPending.current = false
+            for (const bar of document.querySelectorAll('[role="tablist"]')) {
+              for (const tab of bar.querySelectorAll('[role="tab"]')) {
+                if (tab.textContent.includes('\u4F1A\u8BDD\u5730\u56FE') && tab.getAttribute('aria-selected') !== 'true') {
+                  tab.click()
+                  return
+                }
+              }
+            }
+          }
+          const observer = new MutationObserver(restoreSynapseTab)
+          observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['aria-selected'] })
           return () => {
+            observer.disconnect()
             frame?.removeEventListener('load', onFrameLoad)
             window.removeEventListener('message', onMessage)
             unsubscribeSessions()
